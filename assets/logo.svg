@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" role="img" aria-label="Melody Global">
+  <style>
+    .mg-text { font-family: 'Playfair Display', 'Didot', 'Bodoni 72', Georgia, serif; font-weight: 700; letter-spacing: 0.08em; }
+    .mg-green { fill: #0B3D1F; }
+    .mg-gold { fill: #B08D57; }
+  </style>
+  <text x="200" y="68" text-anchor="middle" class="mg-text mg-green" font-size="56">MELODY</text>
+  <text x="200" y="132" text-anchor="middle" class="mg-text mg-green" font-size="56">GL<tspan class="mg-gold">O</tspan>BAL</text>
+</svg>
