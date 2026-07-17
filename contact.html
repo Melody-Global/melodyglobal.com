@@ -11,6 +11,61 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,500;1,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/styles.css">
+<style>
+  .thank-you {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 360px;
+    animation: fadeUp 0.5s ease forwards;
+  }
+  .thank-you h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--heading, #003300);
+    margin-bottom: 1rem;
+  }
+  .thank-you p {
+    font-size: 1.05rem;
+    color: #555;
+    line-height: 1.7;
+    max-width: 440px;
+  }
+  .check-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #003300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+  .check-icon svg {
+    width: 28px;
+    height: 28px;
+    stroke: #fff;
+  }
+  .form-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    margin-bottom: 1rem;
+    display: none;
+  }
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
 </head>
 <body>
 
@@ -63,8 +118,9 @@
           </dl>
         </div>
 
-        <div>
-          <form class="form-grid" action="mailto:ir@melodyglobal.com" method="post" enctype="text/plain" aria-label="Investor inquiry form">
+        <div id="formColumn">
+          <div id="formError" class="form-error"></div>
+          <form id="contactForm" class="form-grid" aria-label="Investor inquiry form">
             <div>
               <label for="name">Name</label>
               <input id="name" name="name" type="text" required autocomplete="name">
@@ -94,7 +150,7 @@
               <textarea id="message" name="message" required></textarea>
             </div>
             <div>
-              <button class="btn btn-primary" type="submit">Send Inquiry</button>
+              <button id="submitBtn" class="btn btn-primary" type="submit">Send Inquiry</button>
             </div>
             <p style="font-size:0.82rem; color:var(--muted); margin:0;">By submitting this form you acknowledge that no part of this inquiry constitutes an offer to sell or a solicitation of an offer to buy any security.</p>
           </form>
@@ -144,5 +200,57 @@
 </footer>
 
 <script src="assets/main.js"></script>
+<script>
+
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xeeyaezq';
+
+const form = document.getElementById('contactForm');
+const formColumn = document.getElementById('formColumn');
+const submitBtn = document.getElementById('submitBtn');
+const formError = document.getElementById('formError');
+
+form.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  formError.style.display = 'none';
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Sending\u2026';
+
+  const formData = new FormData(form);
+
+  try {
+    const response = await fetch(FORMSPREE_ENDPOINT, {
+      method: 'POST',
+      body: formData,
+      headers: { 'Accept': 'application/json' }
+    });
+
+    if (response.ok) {
+      formColumn.innerHTML =
+        '<div class="thank-you">' +
+          '<div class="check-icon">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
+              '<polyline points="20 6 9 17 4 12"></polyline>' +
+            '</svg>' +
+          '</div>' +
+          '<h2>Thank you.</h2>' +
+          '<p>Your inquiry has been received. A member of our investor relations team will be in touch shortly.</p>' +
+          '<p style="margin-top:1.5rem; font-size:0.9rem; color:#888;">' +
+            'In the meantime, feel free to reach us directly at ' +
+            '<a href="mailto:ir@melodyglobal.com" style="color:#003300;">ir@melodyglobal.com</a> or ' +
+            '<a href="tel:+18017428242" style="color:#003300;">801.742.8242</a>.' +
+          '</p>' +
+        '</div>';
+    } else {
+      var data = await response.json();
+      throw new Error(data.error || 'Submission failed');
+    }
+  } catch (err) {
+    formError.textContent = 'Something went wrong. Please try again or email us directly at ir@melodyglobal.com.';
+    formError.style.display = 'block';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Send Inquiry';
+  }
+});
+</script>
 </body>
 </html>
